@@ -1,7 +1,7 @@
 extends Area2D
 
 var tile_size = 64
-var move_delay = 0.3
+var move_delay = 0.25
 var anim_speed = 5
 var inputs = {"right": Vector2.RIGHT,
 		"left": Vector2.LEFT,
@@ -30,23 +30,25 @@ func _unhandled_input(event: InputEvent):
 		start_moving(movedir)
 		
 func start_moving(action):
-	move_player(inputs[action] * tile_size)
-	moving = true
-	delta_time = 0
-	move_current_dir = action
+	if moving:
+		return
+	else:
+		moving = true
+		delta_time = 0
+		move_current_dir = action
+		move_player(inputs[action] * tile_size)
 	
 func move_player(rel_position):
 	position += rel_position
 		
 func _process(delta):
 	if moving:
-		if Input.is_action_pressed(move_current_dir):
-			delta_time += delta
-			$Label.text = str(delta_time)
-			if delta_time > move_delay:
+		delta_time += delta
+		$Label.text = str(delta_time)
+		if delta_time > move_delay:
+			delta_time = 0
+			if Input.is_action_pressed(move_current_dir):
 				move_player(inputs[move_current_dir] * tile_size)
-				delta_time = 0
-		else:
-			moving = false
-			move_current_dir = "none"
-	
+			else:
+				moving = false
+				move_current_dir = "none"
